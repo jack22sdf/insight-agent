@@ -5,6 +5,8 @@ import json
 import os
 import pandas as pd
 import streamlit as st
+from contextlib import nullcontext
+from access_control import online_access
 from engine import report
 from orchestration import run_analysis
 
@@ -14,7 +16,8 @@ st.caption('经营分析 / Planner → Analyst → Reviewer → 有界修订')
 with st.sidebar:
     st.header('数据工作区')
     uploaded = st.file_uploader('上传 CSV（UTF-8，最大 10 MB）', type=['csv'])
-    offline = st.checkbox('离线计算（不调用模型）', value=False)
+    offline = st.checkbox('离线计算（不调用模型）', value=True)
+    password = st.text_input('在线访问密码', type='password', max_chars=256) if not offline else ''
     st.info('DeepSeek 已配置' if os.getenv('DEEPSEEK_API_KEY') or os.getenv('LLM_API_KEY') else '未配置模型，使用离线计算')
     st.caption('在线模式将问题、字段名和汇总指标发送给配置的服务。模型复核不等于事实保证。')
 sample = 'date,amount,category\n2026-10-01,1200,直营\n2026-10-01,800,电商\n2026-10-02,1500,直营\n2026-10-02,950,电商\n2026-10-03,-100,电商\n2026-10-03,1800,直营\n'
@@ -56,7 +59,8 @@ if st.button('运行分析 →', type='primary'):
     else:
         try:
             with st.spinner('规划、计算、分析与复核中…'):
-                outcome = run_analysis(frame, date, amount, group, question, offline=offline)
+                with nullcontext() if offline else online_access(password):
+                    outcome = run_analysis(frame, date, amount, group, question, offline=offline)
             st.session_state['analysis'] = outcome
             st.session_state['fingerprint'] = fingerprint
         except ValueError as exc:

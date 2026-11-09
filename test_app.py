@@ -30,6 +30,17 @@ class AppTests(unittest.TestCase):
         self.assertEqual(len(app.metric), 0)
         self.assertFalse(app.exception)
 
+    def test_online_without_config_never_calls_model(self):
+        import os
+        app = self.start()
+        with patch.dict(os.environ, {'ONLINE_PASSWORD_HASH': ''}):
+            app.checkbox[0].set_value(False).run()
+            with patch('orchestration.run_analysis') as call:
+                app.button[0].click().run()
+                call.assert_not_called()
+        self.assertTrue(app.error)
+        self.assertFalse(app.exception)
+
     def test_blank_question(self):
         app = self.start()
         app.text_input[0].set_value('   ').run()

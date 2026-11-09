@@ -226,3 +226,7 @@ insight-agent/
 参考 [MetaGPT](https://github.com/FoundationAgents/MetaGPT) 和 [AutoGen](https://github.com/microsoft/autogen) 的角色协作思路。本项目独立实现，未复制或集成它们的源码。设计不要求依赖大型 Agent 框架。
 
 欢迎提交最小复现、测试用例或改进 PR。报告问题时请使用合成数据并移除 Key、个人路径和业务隐私。修改计算或编排逻辑后请运行全部测试；涉及模型行为时另行记录真实调用条件与结果。
+
+## 部署到服务器
+
+已提供 Docker Compose + Caddy HTTPS 配置，以及在线密码校验、持久化全站任务限额和单进程并发限制。默认公开示例与离线分析，在线运行需要密码；详见 [服务器部署说明](DEPLOY.md)。当前共 24 项本地测试通过。服务器部署与 TLS 尚待实际环境验证。

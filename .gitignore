@@ -5,3 +5,6 @@
 __pycache__/
 *.pyc
 live_smoke_result.json
+server.env
+deploy.env
+data/
